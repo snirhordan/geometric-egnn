@@ -137,15 +137,15 @@ def prep_vec_for_embed(coord, final_index_list, edge_index):
     #add the perp vector
     perp_vec = torch.linalg.cross( coord[row] , coord[col] ).unsqueeze(-2)
     #normalize perp vector
-    #row_norm = torch.linalg.norm(coord[row], dim=1)
-    #col_norm = torch.linalg.norm(coord[col], dim=1)
+    row_norm = torch.linalg.norm(coord[row], dim=1)
+    col_norm = torch.linalg.norm(coord[col], dim=1)
     #candidates is for differentiable maximum
-    #candidates = torch.cat([row_norm.unsqueeze(1), col_norm.unsqueeze(1)], dim=1)
+    candidates = torch.cat([row_norm.unsqueeze(1), col_norm.unsqueeze(1)], dim=1)
     #calculate differentiable maximum for each 2-tuple choice
-    #rlsoftmax = torch.log(torch.sum(torch.exp(candidates), dim=1)).reshape(perp_vec.size(0),1,1)
-    #perp_vec = F.normalize(perp_vec, dim=2) # MISTAKE
+    rlsoftmax = torch.log(torch.sum(torch.exp(candidates), dim=1)).reshape(perp_vec.size(0),1,1)
+    perp_vec = F.normalize(perp_vec, dim=2) # MISTAKE
     #after normalization multiply by maximum
-    #perp_vec = torch.mul(perp_vec.transpose(dim0=-1,dim1=-2), rlsoftmax).transpose(dim0=-1,dim1=-2)
+    perp_vec = torch.mul(perp_vec.transpose(dim0=-1,dim1=-2), rlsoftmax).transpose(dim0=-1,dim1=-2)
     #return point cloud with "maximum"-normed cross product vec
     cat = torch.cat([ perp_vec, populate], dim=1) #checked
     return cat
